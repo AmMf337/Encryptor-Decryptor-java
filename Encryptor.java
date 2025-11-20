@@ -45,11 +45,11 @@ public class Encryptor {
     }
 
     private static void encryptFile(Scanner scanner) throws Exception {
-        System.out.print("Ruta del archivo a cifrar: ");
-        String inputFile = scanner.nextLine();
+        System.out.print("Nombre del archivo a cifrar: ");
+        String inputFile = ("./texts/" + scanner.nextLine() + ".txt");
 
-        System.out.print("Ruta del archivo cifrado (salida): ");
-        String outputFile = scanner.nextLine();
+        System.out.print("Nombre del archivo cifrado (salida): ");
+        String outputFile = ("./encrypted/" + scanner.nextLine() + ".enc");
 
         System.out.print("Contraseña: ");
         String password = scanner.nextLine();
@@ -86,11 +86,11 @@ public class Encryptor {
     }
 
     private static void decryptFile(Scanner scanner) throws Exception {
-        System.out.print("Ruta del archivo cifrado: ");
-        String inputFile = scanner.nextLine();
+        System.out.print("Nombre del archivo cifrado: ");
+        String inputFile = ("./encrypted/" + scanner.nextLine() + ".enc");
 
         System.out.print("Ruta del archivo descifrado (salida): ");
-        String outputFile = scanner.nextLine();
+        String outputFile = ("./decrypted/" + scanner.nextLine() + ".txt");
 
         System.out.print("Contraseña: ");
         String password = scanner.nextLine();
@@ -137,6 +137,72 @@ public class Encryptor {
             System.err.println("El archivo puede estar corrupto o la contraseña es incorrecta");
         }
     }
+    //para debuggear componentes
+        /*private static void decryptFile(Scanner scanner) throws Exception {
+        System.out.print("Nombre del archivo cifrado: ");
+        String inputFile = ("./encrypted/" + scanner.nextLine() + ".enc");
+
+        System.out.print("Ruta del archivo descifrado (salida): ");
+        String outputFile = ("./decrypted/" + scanner.nextLine() + ".txt");
+
+        System.out.print("Contraseña: ");
+        String password = scanner.nextLine();
+
+        // Leer archivo cifrado
+        byte[] encryptedFile = readFile(inputFile);
+
+        if (encryptedFile.length < SALT_SIZE + IV_SIZE + 32) {
+            throw new Exception("Archivo cifrado inválido o corrupto");
+        }
+
+        // Extraer componentes
+        byte[] salt = Arrays.copyOfRange(encryptedFile, 0, SALT_SIZE);
+        byte[] iv = Arrays.copyOfRange(encryptedFile, SALT_SIZE, SALT_SIZE + IV_SIZE);
+        byte[] storedHash = Arrays.copyOfRange(encryptedFile, SALT_SIZE + IV_SIZE,
+                SALT_SIZE + IV_SIZE + 32);
+        byte[] encryptedData = Arrays.copyOfRange(encryptedFile, SALT_SIZE + IV_SIZE + 32,
+                encryptedFile.length);
+
+        System.out.println("Salt (hex): " + bytesToHex(salt));
+        System.out.println("IV (hex): " + bytesToHex(iv));
+        System.out.println("Hash SHA-256 almacenado: " + bytesToHex(storedHash));
+
+        // Guardar componentes en un archivo de texto para ver cómo luce
+        String componentsFile = outputFile.replace(".txt", "_componentes.txt");
+        try (FileWriter fw = new FileWriter(componentsFile)) {
+            fw.write("Salt (hex): " + bytesToHex(salt) + "\n");
+            fw.write("IV (hex): " + bytesToHex(iv) + "\n");
+            fw.write("Hash SHA-256 almacenado: " + bytesToHex(storedHash) + "\n");
+            fw.write("Datos cifrados (hex): " + bytesToHex(encryptedData) + "\n");
+        }
+
+        System.out.println("Componentes guardados en: " + componentsFile);
+
+        // Derivar clave usando PBKDF2
+        SecretKey key = deriveKey(password, salt);
+
+        // Descifrar datos
+        byte[] decryptedData = decrypt(encryptedData, key, iv);
+
+        // Calcular hash del archivo descifrado
+        byte[] computedHash = calculateSHA256(decryptedData);
+        System.out.println("Hash SHA-256 calculado: " + bytesToHex(computedHash));
+
+        // Verificar integridad
+        if (MessageDigest.isEqual(storedHash, computedHash)) {
+            System.out.println("✓ Verificación de integridad exitosa");
+
+            // Escribir archivo descifrado
+            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                fos.write(decryptedData);
+            }
+
+            System.out.println("Archivo descifrado exitosamente: " + outputFile);
+        } else {
+            System.err.println("✗ ERROR: La verificación de integridad falló");
+            System.err.println("El archivo puede estar corrupto o la contraseña es incorrecta");
+        }
+    } */
 
     private static SecretKey deriveKey(String password, byte[] salt) throws Exception {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");

@@ -1,0 +1,4 @@
+Salt (hex): eeb8607d4703d896077678f839edd2d4
+IV (hex): 346429b355d9fa63850a51e420c88eba
+Hash SHA-256 almacenado: 0b894166d3336435c800bea36ff21b29eaa801a52f584c006c49289a0dcf6e2f
+Datos cifrados (hex): 81eb5df56599e0987ff1362f4bbda811

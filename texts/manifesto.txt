@@ -1,0 +1,6 @@
+We are the children of the terminal.
+We do not click. We type.
+We do not ask for help. We read the man pages.
+We do not fear the stack trace.
+We fear the uncommitted changes.
+And we know: the cloud is just someone else's computer.

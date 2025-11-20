@@ -1,0 +1,3 @@
+If a system can break, it will.
+If it can break in multiple ways, it will break in the worst possible way.
+And if you fixed it yesterday? It’s broken again — but now in Kubernetes.
