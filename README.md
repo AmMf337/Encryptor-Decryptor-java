@@ -235,4 +235,99 @@ Se escribe en el archivo de origen cada parte de encriptación en el orden espec
         }
     }
 ```
+1. Lectura de rutas y contraseña:javaSystem.out.print("Nombre del archivo cifrado: ");
 
+```java
+String inputFile = ("./encrypted/" + scanner.nextLine() + ".enc");
+
+System.out.print("Ruta del archivo descifrado (salida): ");
+String outputFile = ("./decrypted/" + scanner.nextLine() + ".txt");
+
+System.out.print("Contraseña: ");
+String password = scanner.nextLine();
+
+byte[] encryptedFile = readFile(inputFile);
+```
+
+2. Validación del tamaño del archivo:
+
+```java
+if (encryptedFile.length < SALT_SIZE + IV_SIZE + 32) {
+    throw new Exception("Archivo cifrado inválido o corrupto");
+}
+```
+
+3. Extracción de componentes del archivo cifrado:
+
+```java
+byte[] salt = Arrays.copyOfRange(encryptedFile, 0, SALT_SIZE);
+byte[] iv = Arrays.copyOfRange(encryptedFile, SALT_SIZE, SALT_SIZE + IV_SIZE);
+byte[] storedHash = Arrays.copyOfRange(encryptedFile, SALT_SIZE + IV_SIZE,
+        SALT_SIZE + IV_SIZE + 32);
+byte[] encryptedData = Arrays.copyOfRange(encryptedFile, SALT_SIZE + IV_SIZE + 32,
+        encryptedFile.length);
+
+System.out.println("Hash SHA-256 almacenado: " + bytesToHex(storedHash));
+```
+En este paso es importante que el formato en el que se guardó el archivo cifrado sea igual al esperado, pues si alguno de los valores no concuerda o esta en otra posición el desencriptado fallará.
+
+4. Derivación de la clave usando PBKDF2:
+
+```java
+SecretKey key = deriveKey(password, salt);
+```
+
+**Método deriveKey**
+
+```java
+private static SecretKey deriveKey(String password, byte[] salt) throws Exception {
+    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+    KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATION_COUNT, KEY_SIZE);
+    SecretKey tmp = factory.generateSecret(spec);
+    return new SecretKeySpec(tmp.getEncoded(), "AES");
+}
+```
+Se repite el proceso de generación de la clave con el salt extraido y la contraseña ingresada, si alguno de los valores es diferente el descifrado produce basura.
+
+5. Desencriptado de los datos:
+
+```java
+javabyte[] decryptedData = decrypt(encryptedData, key, iv);
+```
+
+**Método decrypt**:
+
+```java
+private static byte[] decrypt(byte[] data, SecretKey key, byte[] iv) throws Exception {
+    Cipher cipher = Cipher.getInstance(ALGORITHM);
+    IvParameterSpec ivSpec = new IvParameterSpec(iv);
+    cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+    return cipher.doFinal(data);
+}
+```
+
+Se repite el proceso del método encrypt usando el la llave generada, el iv extraido y con la clase cipher en modo decrypt.
+
+6. Cálculo del hash del archivo descifrado:
+
+```java
+byte[] computedHash = calculateSHA256(decryptedData);
+System.out.println("Hash SHA-256 calculado: " + bytesToHex(computedHash));
+.....
+.....
+if (MessageDigest.isEqual(storedHash, computedHash)) {
+    System.out.println("✓ Verificación de integridad exitosa");
+
+    try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+        fos.write(decryptedData);
+    }
+
+    System.out.println("Archivo descifrado exitosamente: " + outputFile);
+} else {
+    System.err.println("✗ ERROR: La verificación de integridad falló");
+    System.err.println("El archivo puede estar corrupto o la contraseña es incorrecta");
+}
+
+```
+
+Finalamente se calcula el hash del mensaje y se compara con el extraido, si son diferentes puede significar que el mensaje fue modificado o el archivo esta corrupto.
