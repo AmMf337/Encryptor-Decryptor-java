@@ -14,28 +14,33 @@ public class Encryptor {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String option = "0";
 
-        System.out.println("=== Sistema de Cifrado de Archivos ===");
-        System.out.println("1. Cifrar archivo");
-        System.out.println("2. Descifrar archivo");
-        System.out.print("Seleccione una opción: ");
-
-        int option = scanner.nextInt();
-        scanner.nextLine();
-
-        try {
-            if (option == 1) {
-                encryptFile(scanner);
-            } else if (option == 2) {
-                decryptFile(scanner);
-            } else {
-                System.out.println("Opción inválida");
+        do {
+            try {
+                System.out.println("=== Sistema de Cifrado de Archivos ===");
+                System.out.println("1. Cifrar archivo");
+                System.out.println("2. Descifrar archivo");
+                System.out.println("3. Salir");
+                System.out.print("Seleccione una opción: ");
+                
+                option = scanner.nextLine().trim();
+                
+                if (option.equals("1")) {
+                    encryptFile(scanner);
+                } else if (option.equals("2")) {
+                    decryptFile(scanner);
+                } else if (option.equals("3")) {
+                    System.out.println("Saliendo...");
+                } else {
+                    System.out.println("Opción inválida. Por favor, seleccione 1, 2 o 3.");
+                }
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-
+        } while (!option.equals("3"));
+        
         scanner.close();
     }
 
