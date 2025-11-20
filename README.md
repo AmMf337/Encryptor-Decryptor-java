@@ -330,4 +330,14 @@ if (MessageDigest.isEqual(storedHash, computedHash)) {
 
 ```
 
+## Dificultades
+
+En el desarrollo del proyecto surgieron varias dificultades concretas relacionadas con el manejo de parámetros criptográficos. Una de las más frecuentes fue el uso incorrecto de valores como el tamaño del IV, el tamaño del salt o el número de iteraciones para PBKDF2. En algunos casos, cambiar uno de estos valores sin actualizar el resto provocaba que el descifrado generara datos ilegibles, haciendo difícil identificar el origen del problema. Otra dificultad se presentó al escribir y leer el archivo cifrado: si los bytes no se almacenaban exactamente en el orden definido (salt, IV, hash y datos cifrados), el descifrado fallaba aunque el algoritmo fuera correcto, lo que obligó a revisar cuidadosamente el formato y el manejo de índices en los arreglos.
+
+También resultó desafiante interpretar errores silenciosos propios de la criptografía. Por ejemplo, cuando se usaba una contraseña incorrecta, un salt distinto o parámetros mal configurados, el programa no generaba una excepción clara, sino que producía resultados inválidos. Esto obligó a depurar con herramientas auxiliares, como impresión de hashes intermedios, para localizar el origen del problema. En resumen, el proyecto permitió comprender mejor la importancia del uso adecuado de parámetros criptográficos y la atención al detalle al manipular datos binarios dentro de un sistema de cifrado real.
+
+## Conclusiones
+
+Como conclusión, el proyecto permitió aplicar de manera práctica conceptos fundamentales de criptografía moderna dentro de un desarrollo real en Java. El uso de AES en modo CBC combinado con claves derivadas mediante PBKDF2 reforzó la seguridad del cifrado, haciendo más difícil que un atacante pueda obtener la clave mediante fuerza bruta. Además, la inclusión de un hash SHA-256 permitió validar la integridad del archivo descifrado, garantizando que no hubiera sido manipulado durante el proceso. En términos generales, la experiencia ayudó a comprender de forma concreta cómo funcionan los mecanismos de cifrado, derivación de claves y verificación de integridad, tal como se aplican en sistemas reales orientados a proteger la confidencialidad de la información.
+
 Finalamente se calcula el hash del mensaje y se compara con el extraido, si son diferentes puede significar que el mensaje fue modificado o el archivo esta corrupto.
